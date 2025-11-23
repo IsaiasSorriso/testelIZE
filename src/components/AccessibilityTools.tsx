@@ -53,11 +53,11 @@ export function AccessibilityTools() {
     // ---------------- TTS (Text To Speech) ----------------
 
     const ttsButton = document.createElement('button');
-    ttsButton.innerText = '🔊 Ler texto';
+    ttsButton.innerText = '🔊';
 
     ttsButton.style.position = 'fixed';
-    ttsButton.style.bottom = '20px';
-    ttsButton.style.right = '20px';
+    ttsButton.style.bottom = '90px'; // fica um pouco acima do VLibras
+    ttsButton.style.left = '20px'; 
     ttsButton.style.padding = '12px 16px';
     ttsButton.style.borderRadius = '10px';
     ttsButton.style.border = 'none';
