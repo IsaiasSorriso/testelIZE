@@ -32,49 +32,69 @@ export function ExpandableChatDemo() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!input.trim()) return
+  const handleSubmit = async (e: FormEvent) => {
+  e.preventDefault()
+  if (!input.trim()) return
+
+  const userMessage = {
+    role: "user",
+    content: input,
+  }
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      id: prev.length + 1,
+      content: input,
+      sender: "user",
+    },
+  ])
+
+  setInput("")
+  setIsLoading(true)
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: [
+          ...messages.map((msg) => ({
+            role: msg.sender === "user" ? "user" : "assistant",
+            content: msg.content,
+          })),
+          userMessage,
+        ],
+      }),
+    })
+
+    const data = await response.json()
 
     setMessages((prev) => [
       ...prev,
       {
         id: prev.length + 1,
-        content: input,
-        sender: "user",
+        content: data.reply,
+        sender: "ai",
       },
     ])
-    setInput("")
-    setIsLoading(true)
 
-    setTimeout(() => {
-      // Respostas contextualizadas baseadas na pergunta
-      const userMessage = input.toLowerCase();
-      let response = "Essa é uma ótima pergunta! Estou aqui para ajudar no seu aprendizado. 🎓";
-      
-      if (userMessage.includes("curso") || userMessage.includes("aula")) {
-        response = "Temos diversos cursos disponíveis sobre cidadania e direitos! Você pode encontrá-los no menu de Cursos. 📚";
-      } else if (userMessage.includes("xp") || userMessage.includes("pontos")) {
-        response = "Você ganha XP ao completar aulas e responder quizzes corretamente! Quanto mais você aprende, mais pontos acumula! ⭐";
-      } else if (userMessage.includes("badge") || userMessage.includes("conquista")) {
-        response = "As badges são conquistas especiais que você desbloqueia ao atingir marcos importantes. Confira seu perfil para ver todas! 🏆";
-      } else if (userMessage.includes("ranking") || userMessage.includes("posição")) {
-        response = "O ranking mostra sua posição entre outros estudantes. Continue estudando para subir de posição! 🚀";
-      } else if (userMessage.includes("ajuda") || userMessage.includes("dúvida")) {
-        response = "Estou aqui para ajudar! Pode me perguntar sobre cursos, XP, badges, ranking ou qualquer dúvida sobre a plataforma. 💡";
-      }
-      
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          content: response,
-          sender: "ai",
-        },
-      ])
-      setIsLoading(false)
-    }, 1000)
+  } catch (error) {
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: prev.length + 1,
+        content: "Tive um problema pra responder agora 🥲 tenta de novo!",
+        sender: "ai",
+      },
+    ])
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   const handleAttachFile = () => {
     // Funcionalidade de anexar arquivo
