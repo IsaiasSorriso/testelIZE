@@ -1,11 +1,10 @@
 "use client"
 
 import { useState, FormEvent } from "react"
-import { Send, Bot, Paperclip, Mic, CornerDownLeft } from "lucide-react"
+import { Paperclip, Mic, CornerDownLeft } from "lucide-react"
 import { Button } from "./ui/button"
 import {
   ChatBubble,
-  ChatBubbleAvatar,
   ChatBubbleMessage,
 } from "./ui/chat-bubble"
 import { ChatInput } from "./ui/chat-input"
@@ -16,7 +15,6 @@ import {
   ExpandableChatFooter,
 } from "./ui/expandable-chat"
 import { ChatMessageList } from "./ui/chat-message-list"
-import mascotIcon from 'figma:asset/202083b6ed83af38db2a8abb9c97b03fe3f569c7.png';
 import chatIcon from 'figma:asset/326f260239805f33c7580f677fb3589bb5334b10.png';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
@@ -33,79 +31,66 @@ export function ExpandableChatDemo() {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault()
-  if (!input.trim()) return
+    e.preventDefault()
+    if (!input.trim()) return
 
-  const userMessage = {
-    role: "user",
-    content: input,
-  }
-
-  setMessages((prev) => [
-    ...prev,
-    {
-      id: prev.length + 1,
-      content: input,
-      sender: "user",
-    },
-  ])
-
-  setInput("")
-  setIsLoading(true)
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: [
-          ...messages.map((msg) => ({
-            role: msg.sender === "user" ? "user" : "assistant",
-            content: msg.content,
-          })),
-          userMessage,
-        ],
-      }),
-    })
-
-    const data = await response.json()
-
-    setMessages((prev) => [
-      ...prev,
+    const updatedMessages = [
+      ...messages,
       {
-        id: prev.length + 1,
-        content: data.reply,
-        sender: "ai",
+        id: messages.length + 1,
+        content: input,
+        sender: "user",
       },
-    ])
+    ]
 
-  } catch (error) {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        content: "Tive um problema pra responder agora 🥲 tenta de novo!",
-        sender: "ai",
-      },
-    ])
-  } finally {
-    setIsLoading(false)
-  }
-}
+    setMessages(updatedMessages)
+    setInput("")
+    setIsLoading(true)
 
+    // Converte pro formato que a OpenAI espera
+    const fullMessages = updatedMessages
+      .filter(msg => msg.content && msg.content.trim() !== "")
+      .map(msg => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: String(msg.content),
+      }))
 
-  const handleAttachFile = () => {
-    // Funcionalidade de anexar arquivo
-  }
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: fullMessages }),
+      })
 
-  const handleMicrophoneClick = () => {
-    // Funcionalidade de microfone
+      const data = await response.json()
+
+      // adiciona resposta da AI no chat
+      setMessages(prev => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          content: data.response || "Tive um problema pra responder 🥲",
+          sender: "ai",
+        },
+      ])
+    } catch (error) {
+      console.error("Erro:", error)
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: prev.length + 1,
+          content: "Tive um problema pra responder agora 🥲 tenta de novo!",
+          sender: "ai",
+        },
+      ])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSubmit(e as any)
     }
@@ -132,9 +117,7 @@ export function ExpandableChatDemo() {
               key={message.id}
               variant={message.sender === "user" ? "sent" : "received"}
             >
-              <ChatBubbleMessage
-                variant={message.sender === "user" ? "sent" : "received"}
-              >
+              <ChatBubbleMessage variant={message.sender === "user" ? "sent" : "received"}>
                 {message.content}
               </ChatBubbleMessage>
             </ChatBubble>
@@ -160,26 +143,18 @@ export function ExpandableChatDemo() {
             className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
             onKeyDown={handleKeyDown}
           />
+
           <div className="flex items-center p-3 pt-0 justify-between">
             <div className="flex">
-              <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={handleAttachFile}
-              >
+              <Button variant="ghost" size="icon" type="button">
                 <Paperclip className="size-4" />
               </Button>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                type="button"
-                onClick={handleMicrophoneClick}
-              >
+              <Button variant="ghost" size="icon" type="button">
                 <Mic className="size-4" />
               </Button>
             </div>
+
             <Button type="submit" size="sm" className="ml-auto gap-1.5 bg-[#3283FF] hover:bg-[#3283FF]/90">
               Enviar
               <CornerDownLeft className="size-3.5" />
