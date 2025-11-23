@@ -114,12 +114,6 @@ export function ExpandableChatDemo() {
         }
         className="[&>button]:bg-gray-900 [&>button]:shadow-2xl [&>button]:hover:bg-gray-800 [&>button]:w-20 [&>button]:h-20 [&>button]:rounded-full"
   >
-      <ExpandableChatHeader className="flex-col text-center justify-center bg-gradient-to-r from-[#3283FF] to-[#6E9DED]">
-        <h1 className="text-xl font-semibold text-white">Chat com Lize ✨</h1>
-        <p className="text-sm text-white/90">
-          Sua assistente de aprendizado
-        </p>
-      </ExpandableChatHeader>
 
       <ExpandableChatBody>
         <ChatMessageList>
