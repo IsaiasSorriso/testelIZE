@@ -1,4 +1,8 @@
 {
+      "scripts": {
+            "dev": "vite",
+            "build": "vite build"
+      },
       "name": "Gamified Learning Platform",
       "version": "0.1.0",
       "private": true,
@@ -54,9 +58,5 @@
             "@types/node": "^20.10.0",
             "@vitejs/plugin-react-swc": "^3.10.2",
             "vite": "6.3.5"
-      },
-      "scripts": {
-            "dev": "vite",
-            "build": "vite build"
       }
 }
