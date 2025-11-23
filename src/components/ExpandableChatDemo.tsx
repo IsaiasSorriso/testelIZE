@@ -98,11 +98,22 @@ export function ExpandableChatDemo() {
 
   return (
     <ExpandableChat
-      size="lg"
-      position="bottom-right"
-      icon={<ImageWithFallback src={chatIcon} alt="Chat com Lize" className="h-10 w-10 object-contain" />}
-      className="[&>button]:bg-gray-900 [&>button]:shadow-2xl [&>button]:hover:bg-gray-800 [&>button]:w-20 [&>button]:h-20 [&>button]:rounded-full"
-    >
+       size="lg"
+        position="bottom-right"
+        icon={
+          <div
+            onClick={() => window.location.href = "https://lize.vercel.app/"}
+            className="cursor-pointer"
+          >
+            <ImageWithFallback 
+              src={chatIcon} 
+              alt="Chat com Lize" 
+              className="h-10 w-10 object-contain" 
+            />
+          </div>
+        }
+        className="[&>button]:bg-gray-900 [&>button]:shadow-2xl [&>button]:hover:bg-gray-800 [&>button]:w-20 [&>button]:h-20 [&>button]:rounded-full"
+  >
       <ExpandableChatHeader className="flex-col text-center justify-center bg-gradient-to-r from-[#3283FF] to-[#6E9DED]">
         <h1 className="text-xl font-semibold text-white">Chat com Lize ✨</h1>
         <p className="text-sm text-white/90">
